@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAKHMUD/DEV — IT Infrastructure, Networking & Web Development</title>
+
+<!-- ====================================================================
+     MAKHMUD/DEV — bitta HTML faylda to'liq sayt (HTML + CSS + JS)
+     3 til: UZ / RU / EN — TRANSLATIONS obyektida boshqariladi
+     Xizmatlar Madaminov M.K. tajribasi (AD, Windows Server, CCTV, tarmoq,
+     Cisco/Mikrotik, web dasturlash) asosida kengaytirilgan
+     ==================================================================== -->
+
+<style>
+  :root{
+    --bg:#07090a;
+    --bg-2:#0d1112;
+    --line:#1c2426;
+    --text:#eef3f0;
+    --muted:#85988f;
+    --accent:#39ff9c;
+    --accent-2:#7af0ff;
+    --accent-dim:#1c8f63;
+    --warn:#ffb454;
+    --mono:"JetBrains Mono","Fira Code","Courier New",monospace;
+    --sans:"Inter","Segoe UI",sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; overflow-x:hidden; }
+
+  #codeRain{ position:fixed; inset:0; z-index:0; opacity:.34; pointer-events:none; }
+  .grid-bg{
+    position:fixed; inset:0; z-index:0;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:46px 46px; opacity:.3;
+    mask-image:radial-gradient(circle at 50% 15%, black, transparent 75%);
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  section{ position:relative; z-index:1; padding:100px 8vw; }
+  ::selection{ background:var(--accent); color:#06110c; }
+
+  /* ===== HEADER ===== */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 8vw; backdrop-filter:blur(10px);
+    background:rgba(7,9,10,.7); border-bottom:1px solid var(--line);
+  }
+  /* Logotip animatsiyasi: MAKHMUD/DEV — bo'sh joy bo'lmaydi, "/" yarqiraydi */
+  .logo{
+    font-family:var(--mono); font-weight:700; font-size:1.12rem;
+    display:flex; align-items:center; white-space:nowrap; gap:9px;
+  }
+  .logo .dot{ width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); animation:pulse 2s infinite; flex:none; }
+  .logo .word{ display:inline-flex; align-items:baseline; letter-spacing:.2px; }
+  .logo .brand{ color:var(--text); }
+  .logo .slash{ color:var(--accent); display:inline-block; margin:0 1px; animation:slashGlow 2.6s ease-in-out infinite; }
+  .logo .dev{ color:var(--accent); }
+  @keyframes slashGlow{
+    0%,100%{ text-shadow:0 0 4px rgba(57,255,156,.4); transform:scaleY(1); }
+    50%{ text-shadow:0 0 16px rgba(57,255,156,.95), 0 0 30px rgba(122,240,255,.5); transform:scaleY(1.12); }
+  }
+  @keyframes pulse{ 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.5);opacity:.5;} }
+
+  nav{ display:flex; gap:30px; font-size:.9rem; color:var(--muted); }
+  nav a{ position:relative; transition:.25s; }
+  nav a:hover{ color:var(--text); }
+  nav a::after{ content:""; position:absolute; left:0; bottom:-6px; width:0; height:1px; background:var(--accent); transition:.3s; }
+  nav a:hover::after{ width:100%; }
+
+  .header-right{ display:flex; align-items:center; gap:14px; }
+  .lang-switch{ display:flex; gap:4px; background:var(--bg-2); border:1px solid var(--line); border-radius:6px; padding:3px; }
+  .lang-btn{ font-family:var(--mono); font-size:.74rem; padding:6px 10px; border-radius:4px; color:var(--muted); cursor:pointer; transition:.2s; background:transparent; border:none; }
+  .lang-btn:hover{ color:var(--text); }
+  .lang-btn.active{ background:var(--accent); color:#06110c; font-weight:700; }
+
+  .btn{ font-family:var(--mono); font-size:.84rem; padding:10px 18px; border:1px solid var(--accent); border-radius:4px; color:var(--accent); background:transparent; cursor:pointer; transition:.25s; white-space:nowrap; }
+  .btn:hover{ background:var(--accent); color:#06110c; box-shadow:0 0 22px rgba(57,255,156,.4); }
+  .btn-solid{ background:var(--accent); color:#06110c; }
+  .btn-solid:hover{ filter:brightness(1.1); }
+
+  .burger{ display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:6px; }
+  .burger span{ width:22px; height:2px; background:var(--text); display:block; }
+
+  /* ===== HERO ===== */
+  .hero{ min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding-top:120px; }
+  .eyebrow{ font-family:var(--mono); color:var(--accent); font-size:.82rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .eyebrow::before{ content:""; width:28px; height:1px; background:var(--accent); }
+  h1{ font-size:clamp(1.5rem,3.6vw,2.7rem); font-weight:700; letter-spacing:-.5px; line-height:1.25; max-width:840px; }
+  h1 .grad{ background:linear-gradient(100deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p.lead{ margin-top:24px; max-width:580px; color:var(--muted); font-size:1.05rem; }
+  .hero-actions{ display:flex; gap:16px; margin-top:38px; flex-wrap:wrap; }
+
+  .terminal{ margin-top:54px; max-width:640px; background:var(--bg-2); border:1px solid var(--line); border-radius:10px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.5); }
+  .terminal-top{ display:flex; align-items:center; gap:8px; padding:11px 16px; border-bottom:1px solid var(--line); }
+  .terminal-top span{ width:10px; height:10px; border-radius:50%; }
+  .terminal-top span:nth-child(1){ background:#ff5f57; }
+  .terminal-top span:nth-child(2){ background:#febc2e; }
+  .terminal-top span:nth-child(3){ background:#28c840; }
+  .terminal-title{ margin-left:8px; font-family:var(--mono); font-size:.76rem; color:var(--muted); }
+  .terminal-body{ font-family:var(--mono); font-size:.84rem; padding:18px 20px; min-height:140px; color:#cdeede; }
+  .terminal-body .line{ opacity:0; animation:appear .2s forwards; }
+  .terminal-body .prompt{ color:var(--accent); }
+  .cursor{ display:inline-block; width:8px; height:1em; background:var(--accent); vertical-align:text-bottom; animation:blink 1s step-end infinite; }
+  @keyframes appear{ to{ opacity:1; } }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-top:64px; border-radius:10px; overflow:hidden; }
+  .stat{ background:var(--bg-2); padding:26px 20px; }
+  .stat .num{ font-family:var(--mono); font-size:1.9rem; color:var(--accent); font-weight:700; }
+  .stat .label{ color:var(--muted); font-size:.8rem; margin-top:6px; }
+
+  .section-head{ max-width:680px; margin-bottom:54px; }
+  .section-head h2{ font-size:clamp(1.6rem,3.2vw,2.4rem); letter-spacing:-1px; }
+  .section-head p{ color:var(--muted); margin-top:14px; }
+
+  /* ===== SERVICES ===== */
+  .services-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .service-card{ background:var(--bg-2); padding:32px 26px; transition:.3s; opacity:0; transform:translateY(20px); }
+  .service-card.visible{ opacity:1; transform:translateY(0); }
+  .service-card:hover{ background:#10171a; }
+  .service-icon{ width:42px; height:42px; border:1px solid var(--accent-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; color:var(--accent); transition:.3s; }
+  .service-card:hover .service-icon{ box-shadow:0 0 18px rgba(57,255,156,.35); border-color:var(--accent); }
+  .service-card h3{ font-size:1.06rem; margin-bottom:8px; }
+  .service-card p{ color:var(--muted); font-size:.88rem; }
+  .service-tag{ display:inline-block; margin-top:14px; font-family:var(--mono); font-size:.7rem; color:var(--accent); border:1px solid var(--accent-dim); padding:4px 9px; border-radius:20px; }
+
+  /* ===== RACK / OFIS VIZUAL ===== */
+  .showcase{ display:flex; flex-direction:column; gap:36px; }
+  .rack-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; }
+  .rack{ background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:18px; transition:.3s; opacity:0; transform:translateY(18px); }
+  .rack.visible{ opacity:1; transform:translateY(0); }
+  .rack:hover{ border-color:var(--accent-dim); box-shadow:0 14px 30px rgba(0,0,0,.4); }
+  .rack-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .rack-head .ic{ width:30px; height:30px; border-radius:6px; background:rgba(57,255,156,.08); display:flex; align-items:center; justify-content:center; color:var(--accent); }
+  .rack-head h4{ font-size:.92rem; }
+  .rack-row{ display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); border-radius:6px; padding:10px 13px; margin-bottom:8px; font-family:var(--mono); font-size:.74rem; color:var(--muted); line-height:1.5; gap:10px; }
+  .rack-row .status{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); animation:pulse 2.4s infinite; flex:none; }
+  .rack-row .status.warn{ background:var(--warn); box-shadow:0 0 8px var(--warn); }
+  .rack-row .bar{ width:60px; height:4px; background:var(--line); border-radius:3px; overflow:hidden; margin-left:8px; flex:none; }
+  .rack-row .bar i{ display:block; height:100%; background:var(--accent); border-radius:3px; animation:loadbar 3.2s ease-in-out infinite; }
+  @keyframes loadbar{ 0%{ width:20%; } 50%{ width:85%; } 100%{ width:20%; } }
+
+  /* ===== CTA / ALOQA ===== */
+  .cta-box{ background:linear-gradient(135deg,rgba(57,255,156,.08),transparent); border:1px solid var(--line); border-radius:18px; padding:56px 6vw; text-align:center; }
+  .cta-box h2{ font-size:clamp(1.6rem,3.6vw,2.5rem); margin-bottom:16px; }
+  .cta-box p{ color:var(--muted); max-width:520px; margin:0 auto 30px; }
+  .contact-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .contact-row .btn{ display:flex; align-items:center; gap:8px; }
+
+  .problem-form{ max-width:520px; margin:40px auto 0; display:flex; flex-direction:column; gap:14px; text-align:left; }
+  .form-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .problem-form input, .problem-form textarea{
+    flex:1; min-width:200px; background:var(--bg-2); border:1px solid var(--line); border-radius:6px;
+    padding:12px 14px; color:var(--text); font-family:var(--sans); font-size:.92rem; resize:vertical; transition:.25s;
+  }
+  .problem-form input::placeholder, .problem-form textarea::placeholder{ color:var(--muted); }
+  .problem-form input:focus, .problem-form textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(57,255,156,.12); }
+  .problem-form button{ align-self:flex-start; }
+  .form-status{ font-family:var(--mono); font-size:.82rem; min-height:1.2em; }
+  .form-status.ok{ color:var(--accent); }
+  .form-status.err{ color:#ff6b6b; }
+
+  footer{ padding:40px 8vw; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:18px; color:var(--muted); font-size:.84rem; font-family:var(--mono); }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:980px){
+    .stats{ grid-template-columns:repeat(2,1fr); }
+  }
+  @media(max-width:760px){
+    section{ padding:80px 6vw; }
+    nav{ position:fixed; top:64px; left:0; right:0; background:rgba(7,9,10,.98); border-bottom:1px solid var(--line);
+         flex-direction:column; gap:0; padding:10px 6vw; transform:translateY(-130%); transition:.3s; }
+    nav.open{ transform:translateY(0); }
+    nav a{ padding:14px 0; border-bottom:1px solid var(--line); }
+    .burger{ display:flex; }
+    .header-right .btn-solid.nav-cta-desktop{ display:none; }
+    .terminal{ max-width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<canvas id="codeRain"></canvas>
+<div class="grid-bg"></div>
+
+<!-- ====== HEADER ====== -->
+<header>
+  <div class="logo">
+    <span class="dot"></span>
+    <span class="word"><span class="brand">MAKHMUD</span><span class="slash">/</span><span class="dev">DEV</span></span>
+  </div>
+  <nav id="mainNav">
+    <a href="#xizmatlar" data-i18n="nav.services">Xizmatlar</a>
+    <a href="#vizual" data-i18n="nav.infra">Infratuzilma</a>
+    <a href="#aloqa" data-i18n="nav.contact">Aloqa</a>
+  </nav>
+  <div class="header-right">
+    <div class="lang-switch" id="langSwitch">
+      <button class="lang-btn" data-lang="uz">UZ</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <a href="#aloqa" class="btn btn-solid nav-cta-desktop" data-i18n="nav.cta">Murojaat</a>
+    <button class="burger" id="burgerBtn" aria-label="menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="eyebrow" data-i18n="hero.eyebrow">Tizim administratori & Web dasturchi</div>
+  <h1 data-i18n-html="hero.title">Server ishdan chiqdi, kamera o'chdi,<br>internet sekinlashdi, Wi-Fi ulanmayaptimi?<br><span class="grad">Men buni hal qilaman.</span></h1>
+  <p class="lead" data-i18n="hero.lead">Bir marta yo'qotgan ishonchni qaytarish qiyin. 6 yillik IT tajribam bilan biznesingiz infratuzilmasi — serverdan tortib veb-saytgacha — doim ishonchli ishlab turishini ta'minlayman.</p>
+
+  <div class="hero-actions">
+    <a href="#xizmatlar" class="btn btn-solid" data-i18n="hero.btn1">Xizmatlarni ko'rish</a>
+    <a href="#aloqa" class="btn" data-i18n="hero.btn2">Bog'lanish</a>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-top">
+      <span></span><span></span><span></span>
+      <div class="terminal-title">makhmud@dev: ~/diagnostics</div>
+    </div>
+    <div class="terminal-body" id="terminalBody"></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">6+</div><div class="label" data-i18n="stats.years">yil IT tajribasi</div></div>
+    <div class="stat"><div class="num">2</div><div class="label" data-i18n="stats.remote">xizmat shakli: onlayn va oflayn</div></div>
+    <div class="stat"><div class="num">200+</div><div class="label" data-i18n="stats.cameras">sozlangan qurilma/server</div></div>
+    <div class="stat"><div class="num">24/7</div><div class="label" data-i18n="stats.support">texnik yordam</div></div>
+  </div>
+</section>
+
+<!-- ====== XIZMATLAR ====== -->
+<section id="xizmatlar">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="services.eyebrow">Xizmatlar</div>
+    <h2 data-i18n="services.title">To'liq IT xizmatlar spektri</h2>
+    <p data-i18n="services.lead">Server, tarmoq, video kuzatuv va veb-dasturlash bo'yicha amaliy tajribaga asoslangan xizmatlar.</p>
+  </div>
+
+  <div class="services-grid" id="servicesGrid">
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 3 6v6c0 5 4 9 9 10 5-1 9-5 9-10V6l-9-4Z"/></svg></div>
+      <h3 data-i18n="services.s1.title">Active Directory & Windows Server</h3>
+      <p data-i18n="services.s1.text">AD DS o'rnatish, foydalanuvchi/guruh va huquqlarni boshqarish, GPO siyosatlari, domen integratsiyasi.</p>
+      <span class="service-tag">AD / GPO / DNS / DHCP</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/><circle cx="7" cy="7" r=".6" fill="currentColor"/><circle cx="7" cy="17" r=".6" fill="currentColor"/></svg></div>
+      <h3 data-i18n="services.s2.title">Server infratuzilmasi</h3>
+      <p data-i18n="services.s2.text">O'rnatish, sozlash, monitoring, diagnostika va nosozliklarni tezkor bartaraf etish.</p>
+      <span class="service-tag">Windows Server</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 7l-7 5 7 5V7Z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+      <h3 data-i18n="services.s3.title">Videokuzatuv tizimlari</h3>
+      <p data-i18n="services.s3.text">IP-kameralar, Trassir, NVR o'rnatish va sozlash, masofadan kuzatish va saqlash siyosati.</p>
+      <span class="service-tag">CCTV / Trassir / NVR</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <h3 data-i18n="services.s4.title">Cisco (CCNA) tarmoq xizmatlari</h3>
+      <p data-i18n="services.s4.text">Switch va router konfiguratsiyasi, VLAN, marshrutlash protokollari, korporativ tarmoq qurish.</p>
+      <span class="service-tag">Cisco / CCNA</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+      <h3 data-i18n="services.s5.title">MikroTik sozlash</h3>
+      <p data-i18n="services.s5.text">RouterOS konfiguratsiyasi, firewall qoidalari, bandwidth boshqaruvi, VPN tunnellari.</p>
+      <span class="service-tag">MikroTik / RouterOS</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12.5a9 9 0 0 1 14 0M8.5 16a4.5 4.5 0 0 1 7 0M12 19.5h.01"/></svg></div>
+      <h3 data-i18n="services.s6.title">Wi-Fi tarmoqlari va router o'rnatish</h3>
+      <p data-i18n="services.s6.text">Wi-Fi routerlarni ulash, sozlash, qamrov zonasini optimallashtirish, mehmon tarmoqlari.</p>
+      <span class="service-tag">Wi-Fi / Router</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+      <h3 data-i18n="services.s7.title">Tarmoq kabel montaji (LAN)</h3>
+      <p data-i18n="services.s7.text">Strukturali kabel tizimlarini yotqizish, patch-panel, rozetkalar, kabelni krimplash va testlash.</p>
+      <span class="service-tag">LAN / Kabel montaji</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <h3 data-i18n="services.s8.title">Virtualizatsiya</h3>
+      <p data-i18n="services.s8.text">VMware, VirtualBox va Hyper-V muhitlarini joriy qilish va sozlash.</p>
+      <span class="service-tag">VMware / Hyper-V</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <h3 data-i18n="services.s9.title">Backup va antivirus boshqaruvi</h3>
+      <p data-i18n="services.s9.text">Zaxira nusxalash strategiyasi, Kaspersky/Dr.Web antivirus o'rnatish va markazlashgan boshqaruv.</p>
+      <span class="service-tag">Backup / Kaspersky</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <h3 data-i18n="services.s10.title">Veb-sayt yaratish</h3>
+      <p data-i18n="services.s10.text">Zamonaviy, tezkor va animatsiyali veb-saytlar: korporativ sahifalar, landing va biznes saytlari.</p>
+      <span class="service-tag">HTML / CSS / JS</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4v16"/></svg></div>
+      <h3 data-i18n="services.s11.title">Pochta serverlari</h3>
+      <p data-i18n="services.s11.text">Korporativ pochta serverlarini o'rnatish, Exchange administratsiyasi va monitoringi.</p>
+      <span class="service-tag">Mail / Exchange</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14.7 6.3a1 1 0 0 0 1.4 0l1.6-1.6a1 1 0 0 0 0-1.4l-1.6-1.6a1 1 0 0 0-1.4 0L13.1 3.3a1 1 0 0 0 0 1.4l1.6 1.6Z"/><path d="m5 13 4 4L19 7l-4-4L5 13Z"/></svg></div>
+      <h3 data-i18n="services.s12.title">Ofis texnikasi ta'mirlash</h3>
+      <p data-i18n="services.s12.text">Kompyuter, printer va periferiya jihozlarini o'rnatish va ta'mirlash.</p>
+      <span class="service-tag">Hardware</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M16 10l3-2-3-2M8 10 5 8l3-2"/></svg></div>
+      <h3 data-i18n="services.s13.title">Windows va Office o'rnatish / faollashtirish</h3>
+      <p data-i18n="services.s13.text">Windows operatsion tizimini o'rnatish, sozlash va faollashtirish, MS Office o'rnatish va faollashtirish.</p>
+      <span class="service-tag">Windows / MS Office</span>
+    </div>
+
+    <div class="service-card">
+      <div class="service-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 9.5a3 3 0 1 1 4 2.83V14M12 17h.01"/></svg></div>
+      <h3 data-i18n="services.s14.title">Texnik yordam (masofadan va ofisda)</h3>
+      <p data-i18n="services.s14.text">Masofadan turib texnik muammolarni hal qilish, shuningdek ofisga tashrif buyurib har xil IT muammolar bo'yicha murojaat qilish mumkin.</p>
+      <span class="service-tag">Helpdesk / Remote</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== VIZUAL: OFIS INFRATUZILMASI ====== -->
+<section id="vizual">
+  <div class="section-head">
+    <div class="eyebrow" data-i18n="vis.eyebrow">Infratuzilma</div>
+    <h2 data-i18n="vis.title">Real vaqtda nazorat ostida</h2>
+    <p data-i18n="vis.text">Ofisingizdagi har bir server, tarmoq qurilmasi, kamera va ish stansiyasi monitoring tizimida kuzatib boriladi.</p>
+  </div>
+
+  <div class="showcase">
+    <div class="rack-grid" id="rackGrid"><!-- JS orqali to'ldiriladi --></div>
+  </div>
+</section>
+
+<!-- ====== ALOQA ====== -->
+<section id="aloqa">
+  <div class="cta-box">
+    <h2 data-i18n="contact.title">Infratuzilmangizni mustahkamlashga tayyorman</h2>
+    <p data-i18n="contact.text">AD, server, tarmoq, videokuzatuv yoki veb-sayt bo'yicha bepul konsultatsiya uchun bog'laning.</p>
+    <div class="contact-row">
+      <a href="tel:+998774305759" class="btn btn-solid">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +998 77 430-57-59
+      </a>
+      <a href="https://t.me/makhmudj6n" target="_blank" rel="noopener" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4.01 2 11.5l6.2 2.2L20 7l-9 8.2-.3 5.8 3-3.2 5.1 3.8L22 4Z"/></svg>
+        @makhmudj6n
+      </a>
+      <a href="https://t.me/systemadminuz1" target="_blank" rel="noopener" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4.01 2 11.5l6.2 2.2L20 7l-9 8.2-.3 5.8 3-3.2 5.1 3.8L22 4Z"/></svg>
+        <span data-i18n="contact.channel">Kanal</span>: @systemadminuz1
+      </a>
+      <a href="https://instagram.com/makhmudj6n" target="_blank" rel="noopener" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+        @makhmudj6n
+      </a>
+      <a href="mailto:makhmud.dev@gmail.com" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
+        makhmud.dev@gmail.com
+      </a>
+    </div>
+
+    <!-- ====== MUAMMO YUBORISH FORMASI (Web3Forms orqali to'g'ridan-to'g'ri Gmail'ga) ====== -->
+    <form id="problemForm" class="problem-form">
+      <input type="hidden" name="access_key" value="098e2486-05a7-4a5b-b262-b38c7e5c4135">
+      <input type="hidden" name="subject" value="MAKHMUD/DEV — yangi murojaat">
+      <input type="checkbox" name="botcheck" style="display:none;">
+
+      <div class="form-row">
+        <input type="text" name="name" data-i18n-placeholder="form.name" placeholder="Ismingiz" required>
+        <input type="text" name="contact" data-i18n-placeholder="form.contact" placeholder="Telefon yoki Telegram" required>
+      </div>
+      <textarea name="message" data-i18n-placeholder="form.message" placeholder="Muammoingizni yozing..." rows="4" required></textarea>
+      <button type="submit" class="btn btn-solid" id="formSubmitBtn" data-i18n="form.submit">Yuborish</button>
+      <p id="formStatus" class="form-status"></p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div>© <span id="year"></span> MAKHMUD/DEV — <span data-i18n="footer.text">IT infratuzilma va veb-dasturlash xizmatlari</span></div>
+  <div data-i18n="footer.loc">Toshkent, O'zbekiston</div>
+</footer>
+
+<script>
+/* =====================================================================
+   1) TARJIMALAR (UZ / RU / EN)
+   2) Terminal typing animatsiyasi
+   3) Ofis/server-rack holati (kengaytirilgan, kategoriyalar bo'yicha)
+   4) Scroll-reveal (IntersectionObserver)
+   5) Fon kod-yomg'iri animatsiyasi (canvas) — yorqinroq
+   6) Mobil menyu (burger)
+   ===================================================================== */
+
+const TRANSLATIONS = {
+  uz:{
+    "nav.services":"Xizmatlar","nav.infra":"Infratuzilma","nav.contact":"Aloqa","nav.cta":"Murojaat",
+    "hero.eyebrow":"Tizim administratori & Web dasturchi",
+    "hero.title":"Server ishdan chiqdi, kamera o'chdi,<br>internet sekinlashdi, Wi-Fi ulanmayaptimi?<br><span class=\"grad\">Men buni hal qilaman.</span>",
+    "hero.lead":"Bir marta yo'qotgan ishonchni qaytarish qiyin. 6 yillik IT tajribam bilan biznesingiz infratuzilmasi — serverdan tortib veb-saytgacha — doim ishonchli ishlab turishini ta'minlayman.",
+    "hero.btn1":"Xizmatlarni ko'rish","hero.btn2":"Bog'lanish",
+    "stats.years":"yil IT tajribasi","stats.remote":"xizmat shakli: onlayn va oflayn","stats.cameras":"sozlangan qurilma/server","stats.support":"texnik yordam",
+    "services.eyebrow":"Xizmatlar","services.title":"To'liq IT xizmatlar spektri","services.lead":"Server, tarmoq, video kuzatuv va veb-dasturlash bo'yicha amaliy tajribaga asoslangan xizmatlar.",
+    "services.s1.title":"Active Directory & Windows Server","services.s1.text":"AD DS o'rnatish, foydalanuvchi/guruh va huquqlarni boshqarish, GPO siyosatlari, domen integratsiyasi.",
+    "services.s2.title":"Server infratuzilmasi","services.s2.text":"O'rnatish, sozlash, monitoring, diagnostika va nosozliklarni tezkor bartaraf etish.",
+    "services.s3.title":"Videokuzatuv tizimlari","services.s3.text":"IP-kameralar, Trassir, NVR o'rnatish va sozlash, masofadan kuzatish va saqlash siyosati.",
+    "services.s4.title":"Cisco (CCNA) tarmoq xizmatlari","services.s4.text":"Switch va router konfiguratsiyasi, VLAN, marshrutlash protokollari, korporativ tarmoq qurish.",
+    "services.s5.title":"MikroTik sozlash","services.s5.text":"RouterOS konfiguratsiyasi, firewall qoidalari, bandwidth boshqaruvi, VPN tunnellari.",
+    "services.s6.title":"Wi-Fi tarmoqlari va router o'rnatish","services.s6.text":"Wi-Fi routerlarni ulash, sozlash, qamrov zonasini optimallashtirish, mehmon tarmoqlari.",
+    "services.s7.title":"Tarmoq kabel montaji (LAN)","services.s7.text":"Strukturali kabel tizimlarini yotqizish, patch-panel, rozetkalar, kabelni krimplash va testlash.",
+    "services.s8.title":"Virtualizatsiya","services.s8.text":"VMware, VirtualBox va Hyper-V muhitlarini joriy qilish va sozlash.",
+    "services.s9.title":"Backup va antivirus boshqaruvi","services.s9.text":"Zaxira nusxalash strategiyasi, Kaspersky/Dr.Web antivirus o'rnatish va markazlashgan boshqaruv.",
+    "services.s10.title":"Veb-sayt yaratish","services.s10.text":"Zamonaviy, tezkor va animatsiyali veb-saytlar: korporativ sahifalar, landing va biznes saytlari.",
+    "services.s11.title":"Pochta serverlari","services.s11.text":"Korporativ pochta serverlarini o'rnatish, Exchange administratsiyasi va monitoringi.",
+    "services.s12.title":"Ofis texnikasi ta'mirlash","services.s12.text":"Kompyuter, printer va periferiya jihozlarini o'rnatish va ta'mirlash.",
+    "services.s13.title":"Windows va Office o'rnatish / faollashtirish","services.s13.text":"Windows operatsion tizimini o'rnatish, sozlash va faollashtirish, MS Office o'rnatish va faollashtirish.",
+    "services.s14.title":"Texnik yordam (masofadan va ofisda)","services.s14.text":"Masofadan turib texnik muammolarni hal qilish, shuningdek ofisga tashrif buyurib har xil IT muammolar bo'yicha murojaat qilish mumkin.",
+    "vis.eyebrow":"Infratuzilma","vis.title":"Real vaqtda nazorat ostida","vis.text":"Ofisingizdagi har bir server, tarmoq qurilmasi, kamera va ish stansiyasi monitoring tizimida kuzatib boriladi.",
+    "contact.title":"Infratuzilmangizni mustahkamlashga tayyorman","contact.text":"AD, server, tarmoq, videokuzatuv yoki veb-sayt bo'yicha bepul konsultatsiya uchun bog'laning.",
+    "contact.channel":"Kanal",
+    "footer.text":"IT infratuzilma va veb-dasturlash xizmatlari","footer.loc":"Toshkent, O'zbekiston",
+    "form.name":"Ismingiz","form.contact":"Telefon yoki Telegram","form.message":"Muammoingizni yozing...","form.submit":"Yuborish",
+    "form.sending":"Yuborilmoqda...","form.ok":"Rahmat! Xabaringiz yuborildi, tez orada bog'lanaman.","form.err":"Xatolik yuz berdi. Iltimos, telefon yoki Telegram orqali bog'laning.",
+    "rack.server.title":"Server xonasi","rack.network.title":"Tarmoq qurilmalari","rack.office.title":"Ofis ish stansiyalari","rack.cctv.title":"Videokuzatuv",
+  },
+  ru:{
+    "nav.services":"Услуги","nav.infra":"Инфраструктура","nav.contact":"Контакты","nav.cta":"Связаться",
+    "hero.eyebrow":"Системный администратор & Веб-разработчик",
+    "hero.title":"Сервер вышел из строя, камера отключилась,<br>интернет тормозит, Wi-Fi не подключается?<br><span class=\"grad\">Я это решаю.</span>",
+    "hero.lead":"Потерянное однажды доверие клиентов вернуть сложно. С более чем 6-летним опытом в IT я обеспечиваю бесперебойную работу вашей инфраструктуры — от сервера до веб-сайта.",
+    "hero.btn1":"Смотреть услуги","hero.btn2":"Связаться",
+    "stats.years":"лет опыта в IT","stats.remote":"формат: онлайн и оффлайн","stats.cameras":"настроенных устройств/серверов","stats.support":"техподдержка",
+    "services.eyebrow":"Услуги","services.title":"Полный спектр IT-услуг","services.lead":"Услуги, основанные на практическом опыте в серверах, сетях, видеонаблюдении и веб-разработке.",
+    "services.s1.title":"Active Directory и Windows Server","services.s1.text":"Установка AD DS, управление пользователями/группами и правами, политики GPO, интеграция в домен.",
+    "services.s2.title":"Серверная инфраструктура","services.s2.text":"Установка, настройка, мониторинг, диагностика и оперативное устранение сбоев.",
+    "services.s3.title":"Системы видеонаблюдения","services.s3.text":"Установка и настройка IP-камер, Trassir, NVR, удалённый просмотр и политика хранения.",
+    "services.s4.title":"Сетевые услуги Cisco (CCNA)","services.s4.text":"Конфигурация коммутаторов и маршрутизаторов, VLAN, протоколы маршрутизации, построение корпоративной сети.",
+    "services.s5.title":"Настройка MikroTik","services.s5.text":"Конфигурация RouterOS, правила firewall, управление пропускной способностью, VPN-туннели.",
+    "services.s6.title":"Wi-Fi сети и установка роутеров","services.s6.text":"Подключение и настройка Wi-Fi роутеров, оптимизация зоны покрытия, гостевые сети.",
+    "services.s7.title":"Монтаж сетевых кабелей (LAN)","services.s7.text":"Прокладка структурированных кабельных систем, патч-панели, розетки, обжим и тестирование кабеля.",
+    "services.s8.title":"Виртуализация","services.s8.text":"Развёртывание и настройка сред VMware, VirtualBox и Hyper-V.",
+    "services.s9.title":"Резервное копирование и антивирус","services.s9.text":"Стратегия резервного копирования, установка и централизованное управление антивирусом Kaspersky/Dr.Web.",
+    "services.s10.title":"Создание веб-сайтов","services.s10.text":"Современные, быстрые и анимированные сайты: корпоративные страницы, лендинги и бизнес-сайты.",
+    "services.s11.title":"Почтовые серверы","services.s11.text":"Установка корпоративных почтовых серверов, администрирование и мониторинг Exchange.",
+    "services.s12.title":"Ремонт оргтехники","services.s12.text":"Установка и ремонт компьютеров, принтеров и периферии.",
+    "services.s13.title":"Установка / активация Windows и Office","services.s13.text":"Установка и настройка Windows, активация ОС, установка и активация MS Office.",
+    "services.s14.title":"Техподдержка (удалённо и на месте)","services.s14.text":"Решение технических проблем удалённо, а также выезд в офис по любым IT-вопросам.",
+    "vis.eyebrow":"Инфраструктура","vis.title":"Под контролем в реальном времени","vis.text":"Состояние каждого сервера, сетевого устройства, камеры и рабочей станции в офисе отслеживается системой мониторинга.",
+    "contact.title":"Готов укрепить вашу инфраструктуру","contact.text":"Свяжитесь со мной для бесплатной консультации по AD, серверам, сети, видеонаблюдению или сайту.",
+    "contact.channel":"Канал",
+    "footer.text":"Услуги по IT-инфраструктуре и веб-разработке","footer.loc":"Ташкент, Узбекистан",
+    "form.name":"Ваше имя","form.contact":"Телефон или Telegram","form.message":"Опишите вашу проблему...","form.submit":"Отправить",
+    "form.sending":"Отправка...","form.ok":"Спасибо! Сообщение отправлено, скоро свяжусь с вами.","form.err":"Произошла ошибка. Пожалуйста, свяжитесь по телефону или Telegram.",
+    "rack.server.title":"Серверная комната","rack.network.title":"Сетевые устройства","rack.office.title":"Офисные рабочие места","rack.cctv.title":"Видеонаблюдение",
+  },
+  en:{
+    "nav.services":"Services","nav.infra":"Infrastructure","nav.contact":"Contact","nav.cta":"Get in touch",
+    "hero.eyebrow":"System Administrator & Web Developer",
+    "hero.title":"Server down, camera offline,<br>internet slow, Wi-Fi won't connect?<br><span class=\"grad\">I fix it.</span>",
+    "hero.lead":"Trust, once lost, is hard to win back. With 6+ years of IT experience, I keep your business infrastructure — from servers to websites — reliably up and running.",
+    "hero.btn1":"View services","hero.btn2":"Get in touch",
+    "stats.years":"years in IT","stats.remote":"format: online and on-site","stats.cameras":"devices/servers configured","stats.support":"technical support",
+    "services.eyebrow":"Services","services.title":"A complete range of IT services","services.lead":"Services grounded in real experience across servers, networking, CCTV and web development.",
+    "services.s1.title":"Active Directory & Windows Server","services.s1.text":"AD DS deployment, user/group and permission management, GPO policies, domain integration.",
+    "services.s2.title":"Server Infrastructure","services.s2.text":"Installation, configuration, monitoring, diagnostics and fast incident resolution.",
+    "services.s3.title":"CCTV Systems","services.s3.text":"Installing and configuring IP cameras, Trassir, NVR, remote viewing and storage policy.",
+    "services.s4.title":"Cisco (CCNA) Networking","services.s4.text":"Switch and router configuration, VLANs, routing protocols, building corporate networks.",
+    "services.s5.title":"MikroTik Configuration","services.s5.text":"RouterOS configuration, firewall rules, bandwidth management, VPN tunnels.",
+    "services.s6.title":"Wi-Fi Networks & Router Setup","services.s6.text":"Connecting and configuring Wi-Fi routers, coverage optimization, guest networks.",
+    "services.s7.title":"Network Cabling (LAN)","services.s7.text":"Structured cabling installation, patch panels, sockets, crimping and cable testing.",
+    "services.s8.title":"Virtualization","services.s8.text":"Deploying and configuring VMware, VirtualBox and Hyper-V environments.",
+    "services.s9.title":"Backup & Antivirus Management","services.s9.text":"Backup strategy, Kaspersky/Dr.Web antivirus deployment and centralized management.",
+    "services.s10.title":"Website Development","services.s10.text":"Modern, fast, animated websites: corporate pages, landing pages and business sites.",
+    "services.s11.title":"Mail Servers","services.s11.text":"Corporate mail server deployment, Exchange administration and monitoring.",
+    "services.s12.title":"Office Equipment Repair","services.s12.text":"Installing and repairing computers, printers and peripherals.",
+    "services.s13.title":"Windows & Office Installation / Activation","services.s13.text":"Installing and configuring Windows, OS activation, MS Office installation and activation.",
+    "services.s14.title":"Technical Support (Remote & On-site)","services.s14.text":"Solving technical issues remotely, plus on-site visits for any IT-related problems in your office.",
+    "vis.eyebrow":"Infrastructure","vis.title":"Monitored in real time","vis.text":"Every server, network device, camera and workstation in your office is tracked by the monitoring system.",
+    "contact.title":"Ready to strengthen your infrastructure","contact.text":"Reach out for a free consultation on AD, servers, networking, CCTV or a website.",
+    "contact.channel":"Channel",
+    "footer.text":"IT infrastructure and web development services","footer.loc":"Tashkent, Uzbekistan",
+    "form.name":"Your name","form.contact":"Phone or Telegram","form.message":"Describe your problem...","form.submit":"Send",
+    "form.sending":"Sending...","form.ok":"Thank you! Your message was sent, I'll get back to you soon.","form.err":"Something went wrong. Please reach out via phone or Telegram.",
+    "rack.server.title":"Server Room","rack.network.title":"Network Devices","rack.office.title":"Office Workstations","rack.cctv.title":"CCTV",
+  }
+};
+
+let currentLang = 'uz';
+
+function applyLang(lang){
+  currentLang = lang;
+  const dict = TRANSLATIONS[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-html');
+    if(dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(dict[key] !== undefined) el.placeholder = dict[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  buildTerminal();
+  buildRack();
+}
+
+document.getElementById('langSwitch').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.lang-btn');
+  if(!btn) return;
+  applyLang(btn.dataset.lang);
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---- MOBIL MENYU ---- */
+const burger = document.getElementById('burgerBtn');
+const mainNav = document.getElementById('mainNav');
+burger.addEventListener('click', ()=> mainNav.classList.toggle('open'));
+mainNav.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> mainNav.classList.remove('open')));
+
+/* ---- TERMINAL ANIMATSIYASI ---- */
+const terminalSets = {
+  uz:[
+    {p:'$ ', t:'tizim holatini tekshirish'},
+    {p:'> ', t:'barcha xizmatlar ishlamoqda — muammo yo\'q'},
+    {p:'$ ', t:'wifi-router diagnostika'},
+    {p:'> ', t:'signal barqaror, tezlik: 1000 Mbit/s'},
+    {p:'$ ', t:'backup nazorati'},
+    {p:'> ', t:'oxirgi zaxira nusxa: bugun, muvaffaqiyatli'},
+    {p:'$ ', t:'mijoz arizasi #482'},
+    {p:'> ', t:'muammo 12 daqiqada hal qilindi'},
+  ],
+  ru:[
+    {p:'$ ', t:'проверка состояния системы'},
+    {p:'> ', t:'все сервисы работают — проблем нет'},
+    {p:'$ ', t:'диагностика wifi-роутера'},
+    {p:'> ', t:'сигнал стабилен, скорость: 1000 Мбит/с'},
+    {p:'$ ', t:'проверка резервной копии'},
+    {p:'> ', t:'последний backup: сегодня, успешно'},
+    {p:'$ ', t:'заявка клиента #482'},
+    {p:'> ', t:'проблема решена за 12 минут'},
+  ],
+  en:[
+    {p:'$ ', t:'system health check'},
+    {p:'> ', t:'all services running — no issues found'},
+    {p:'$ ', t:'wifi router diagnostics'},
+    {p:'> ', t:'signal stable, speed: 1000 Mbit/s'},
+    {p:'$ ', t:'backup verification'},
+    {p:'> ', t:'last backup: today, successful'},
+    {p:'$ ', t:'client ticket #482'},
+    {p:'> ', t:'issue resolved in 12 minutes'},
+  ]
+};
+let termTimer = null;
+function buildTerminal(){
+  if(termTimer) clearTimeout(termTimer);
+  const termBody = document.getElementById('terminalBody');
+  termBody.innerHTML = '';
+  let lineIdx = 0;
+  const lines = terminalSets[currentLang];
+  function typeLine(){
+    if(lineIdx >= lines.length){
+      termBody.innerHTML = '';
+      lineIdx = 0;
+      termTimer = setTimeout(typeLine, 700);
+      return;
+    }
+    const item = lines[lineIdx];
+    const div = document.createElement('div');
+    div.className = 'line';
+    div.innerHTML = '<span class="prompt">'+item.p+'</span>';
+    termBody.appendChild(div);
+    let charIdx = 0;
+    const interval = setInterval(()=>{
+      div.innerHTML = '<span class="prompt">'+item.p+'</span>'+item.t.slice(0,charIdx)+'<span class="cursor"></span>';
+      charIdx++;
+      if(charIdx > item.t.length){
+        clearInterval(interval);
+        div.innerHTML = '<span class="prompt">'+item.p+'</span>'+item.t;
+        lineIdx++;
+        termTimer = setTimeout(typeLine, 420);
+      }
+    }, 22);
+  }
+  typeLine();
+}
+
+/* ---- OFIS / SERVER RACK HOLATI (kengaytirilgan, kategoriyalashtirilgan) ---- */
+const rackIcons = {
+  server:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/></svg>',
+  network:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12.5a9 9 0 0 1 14 0M8.5 16a4.5 4.5 0 0 1 7 0M12 19.5h.01"/></svg>',
+  office:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/></svg>',
+  cctv:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M23 7l-7 5 7 5V7Z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
+};
+const rackData = [
+  { key:'server', items:[
+      { name:'SRV-DC01', model:'Dell PowerEdge R440 — Domain Controller' },
+      { name:'SRV-MAIL', model:'HPE ProLiant DL380 — Mail Server' },
+      { name:'SRV-BKP', model:'Synology RS1221+ — Backup Storage' }
+    ], warnIdx:-1 },
+  { key:'network', items:[
+      { name:'GW01', model:'MikroTik hAP ac² — Gateway/Router' },
+      { name:'SW-CORE', model:'Cisco Catalyst 2960 — Core Switch' },
+      { name:'AP-Hall', model:'Ubiquiti UniFi AP — Wi-Fi Access Point' }
+    ], warnIdx:-1 },
+  { key:'office', items:[
+      { name:'PC-Buxgalteriya', model:'HP ProDesk 600 G6' },
+      { name:'PC-Boshqaruv', model:'Dell OptiPlex 7090' },
+      { name:'MFU-01', model:'Canon imageRUNNER — printer/skaner' }
+    ], warnIdx:2 },
+  { key:'cctv', items:[
+      { name:'NVR-01', model:'Trassir 16ch — yozuvchi' },
+      { name:'CAM-Kirish', model:'Hikvision DS-2CD — IP-kamera' },
+      { name:'CAM-Hovli', model:'Dahua IPC — IP-kamera' }
+    ], warnIdx:-1 },
+];
+function buildRack(){
+  const grid = document.getElementById('rackGrid');
+  grid.innerHTML = '';
+  const dict = TRANSLATIONS[currentLang];
+  rackData.forEach(group=>{
+    const card = document.createElement('div');
+    card.className = 'rack';
+    const titleKey = 'rack.' + group.key + '.title';
+    let rowsHtml = '';
+    group.items.forEach((item, idx)=>{
+      const warn = idx === group.warnIdx ? 'warn' : '';
+      rowsHtml += `<div class="rack-row"><span><strong style="color:var(--text);">${item.name}</strong><br><span style="color:var(--muted); font-size:.68rem;">${item.model}</span></span><span style="display:flex;align-items:center;"><span class="bar"><i></i></span><span class="status ${warn}" style="margin-left:8px;"></span></span></div>`;
+    });
+    card.innerHTML = `<div class="rack-head"><span class="ic">${rackIcons[group.key]}</span><h4>${dict[titleKey]}</h4></div>${rowsHtml}`;
+    grid.appendChild(card);
+  });
+  // scroll-reveal qayta ilova qilish
+  document.querySelectorAll('.rack').forEach(el=> rackObserver.observe(el));
+}
+
+/* ---- SCROLL REVEAL ---- */
+const cardObserver = new IntersectionObserver((entries)=>{
+  entries.forEach((entry,i)=>{
+    if(entry.isIntersecting){
+      setTimeout(()=>entry.target.classList.add('visible'), i*50);
+      cardObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold:.15 });
+document.querySelectorAll('.service-card').forEach(el=>cardObserver.observe(el));
+
+const rackObserver = new IntersectionObserver((entries)=>{
+  entries.forEach((entry,i)=>{
+    if(entry.isIntersecting){
+      setTimeout(()=>entry.target.classList.add('visible'), i*70);
+      rackObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold:.15 });
+
+/* ---- FON: KOD YOMG'IRI (yorqinroq, dasturchilarga xos) ---- */
+const canvas = document.getElementById('codeRain');
+const ctx = canvas.getContext('2d');
+let w, h, columns, drops;
+const chars = '01{}<>/;=AD()$#*+-.GPODNSVPNSSHIP';
+function resizeCanvas(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  columns = Math.floor(w / 18);
+  drops = new Array(columns).fill(0).map(()=>Math.random()*-50);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+function drawRain(){
+  ctx.fillStyle = 'rgba(7,9,10,0.065)';
+  ctx.fillRect(0,0,w,h);
+  ctx.font = '14px JetBrains Mono, monospace';
+  for(let i=0;i<columns;i++){
+    const text = chars[Math.floor(Math.random()*chars.length)];
+    const brightness = Math.random();
+    ctx.fillStyle = brightness > .85 ? '#bfffe0' : (brightness > .5 ? '#39ff9c' : '#1c8f63');
+    ctx.fillText(text, i*18, drops[i]*18);
+    if(drops[i]*18 > h && Math.random() > .975) drops[i] = 0;
+    drops[i]++;
+  }
+  requestAnimationFrame(drawRain);
+}
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!reduceMotion) drawRain();
+
+/* ---- MUAMMO YUBORISH FORMASI (Web3Forms) ---- */
+const problemForm = document.getElementById('problemForm');
+const formStatus = document.getElementById('formStatus');
+const formSubmitBtn = document.getElementById('formSubmitBtn');
+if(problemForm){
+  problemForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const dict = TRANSLATIONS[currentLang];
+    formSubmitBtn.disabled = true;
+    formStatus.className = 'form-status';
+    formStatus.textContent = dict['form.sending'];
+    try{
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(problemForm)))
+      });
+      const data = await res.json();
+      if(data.success){
+        formStatus.className = 'form-status ok';
+        formStatus.textContent = dict['form.ok'];
+        problemForm.reset();
+      } else {
+        throw new Error('failed');
+      }
+    } catch(err){
+      formStatus.className = 'form-status err';
+      formStatus.textContent = dict['form.err'];
+    } finally {
+      formSubmitBtn.disabled = false;
+    }
+  });
+}
+
+/* ---- BOSHLANG'ICH HOLAT ---- */
+applyLang('uz');
+</script>
+
+</body>
+</html>
