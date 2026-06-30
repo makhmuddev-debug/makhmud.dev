@@ -1,0 +1,2 @@
+# makhmud.dev
+online xizmatlar
